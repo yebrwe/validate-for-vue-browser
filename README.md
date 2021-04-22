@@ -1,11 +1,10 @@
 # Validate for Vue(browser)
 
----
 
 ## 사용 예시
 
 ```html
-<div id="wrap">
+<div id="content">
   <form name="sampleForm">
     <input type="text" v-model="sample.id" ref="id" title="ID" required/>
     <input type="text" v-model="sample.name" ref="name" title="Name"/>
