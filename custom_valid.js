@@ -1,23 +1,13 @@
 //의존성
 //jquery
-//serializeObject.js
+//vue.js
 //validate.js
-//순서
-//1. serialize
-//2. constraints 수정
-//3. validate
-//4. action
 var Valid = (function($, validate){
-	var params={};
-	var constraints={};
-	var valid={};
-	var vm = {};
 	return {
-		init: function(vm, vueObj){
-			this.params = vueObj;
-			this.constraints={};
+		init: function(vm, data){
 			this.vm = vm;
-			for(var key in this.params){
+			this.constraints = {};
+			for(var key in data){
 				this.constraints[key]={};
 				var $elem = $(this.vm.$refs[key]);
 				if($elem.prop('required')){
@@ -26,23 +16,22 @@ var Valid = (function($, validate){
 				
 			}
 			//this.constraints['valid_manual']={presence:{message:"^메시지를 정의해주세요."}};
-			return this;
 		},
-		validate: function(c){
-			if(!c){ throw '제약조건을 입력해주세요'; }
-			this.valid = validate(this.params, c);
+		validate: function(vm, data){
+			this.init(vm, data);
+			var valid = validate(data, this.constraints);
 			
-			if(this.valid){	//유효성 판단
+			if(valid){	//유효성 판단
 				var elem = "";
 				var msg = "";
 				var result = {}; 
-				for(var key in this.valid){
+				for(var key in valid){
 					elem = key;
-					result = this.valid[key][0];
+					result = valid[key][0];
 					if($.isFunction(result.callback)){
 						result.callback();
 					}else{
-						msg = this.valid[key][0];
+						msg = valid[key][0];
 						var $elem = $(this.vm.$refs[elem]);
 						var label = $elem.attr('title');
 						alert('['+ label + '] 은(는) ' + msg);			//유효성 메시지
@@ -51,27 +40,10 @@ var Valid = (function($, validate){
 					break;
 				}
 			}
-			return this.valid;
+			return valid;
 		},
 		getConstraints: function(){
 			return this.constraints;
-		},
-		getParams: function(){
-			return this.params;
-		},
-
+		}
 	}
-})(jQuery, validate);
-
-validate.validators.custom = function(value, options, key, attributes) {
-    if(!value || value == "<p><br></p>"){
-    	return {
-    	    callback: function(){
-		        alert('['+ options.label + '] 은(는) ' + options.message);
-		        oEditors.getById[options.targetId].exec("FOCUS"); //포커싱
-    	    }
-        };
-    } else {
-			return undefined;
-    }
-};
+})(jQuery, validate); 
